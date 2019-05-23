@@ -2,7 +2,6 @@ package macos
 
 import "unsafe"
 
-// #cgo LDFLAGS: -framework Cocoa
 // #import <CoreGraphics/CoreGraphics.h>
 import "C"
 

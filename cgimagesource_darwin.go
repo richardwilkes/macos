@@ -14,5 +14,5 @@ func (is CGImageSource) CreateImageAtIndex(index int, options CFDictionary) CGIm
 }
 
 func (is CGImageSource) Release() {
-	C.CFRelease(C.CFTypeRef(is))
+	C.CFRelease(CFType(is))
 }
