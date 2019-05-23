@@ -12,6 +12,17 @@ const (
 )
 
 const (
+	CGImageAlphaNone CGImageAlphaInfo = iota
+	CGImageAlphaPremultipliedLast
+	CGImageAlphaPremultipliedFirst
+	CGImageAlphaLast
+	CGImageAlphaFirst
+	CGImageAlphaNoneSkipLast
+	CGImageAlphaNoneSkipFirst
+	CGImageAlphaOnly
+)
+
+const (
 	CGImageByteOrderMask     CGImageByteOrderInfo = 0x7000
 	CGImageByteOrderDefault                       = 0 << 12
 	CGImageByteOrder16Little                      = 1 << 12
@@ -35,6 +46,7 @@ const (
 type (
 	CGImage                = C.CGImageRef
 	CGColorRenderingIntent int32
+	CGImageAlphaInfo       uint32
 	CGImageByteOrderInfo   uint32
 	CGBitmapInfo           uint32
 )
