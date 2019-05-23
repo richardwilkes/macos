@@ -23,24 +23,34 @@ const (
 )
 
 const (
-	CGImageByteOrderMask     CGImageByteOrderInfo = 0x7000
-	CGImageByteOrderDefault                       = 0 << 12
-	CGImageByteOrder16Little                      = 1 << 12
-	CGImageByteOrder32Little                      = 2 << 12
-	CGImageByteOrder16Big                         = 3 << 12
-	CGImageByteOrder32Big                         = 4 << 12
+	CGImageByteOrderDefault CGImageByteOrderInfo = iota << 12
+	CGImageByteOrder16Little
+	CGImageByteOrder32Little
+	CGImageByteOrder16Big
+	CGImageByteOrder32Big
+	CGImageByteOrderMask CGImageByteOrderInfo = 0x7000
 )
 
 const (
-	CGBitmapAlphaInfoMask     CGBitmapInfo = 0x1F
-	CGBitmapFloatInfoMask                  = 0xF00
-	CGBitmapFloatComponents                = 1 << 8
-	CGBitmapByteOrderMask                  = CGBitmapInfo(CGImageByteOrderMask)
-	CGBitmapByteOrderDefault               = CGImageByteOrderDefault
-	CGBitmapByteOrder16Little              = CGImageByteOrder16Little
-	CGBitmapByteOrder32Little              = CGImageByteOrder32Little
-	CGBitmapByteOrder16Big                 = CGImageByteOrder16Big
-	CGBitmapByteOrder32Big                 = CGImageByteOrder32Big
+	CGBitmapAlphaInfoMask           CGBitmapInfo = 0x1F
+	CGBitmapAlphaNone                            = CGBitmapInfo(CGImageAlphaNone)
+	CGBitmapAlphaPremultipliedLast               = CGBitmapInfo(CGImageAlphaPremultipliedLast)
+	CGBitmapAlphaPremultipliedFirst              = CGBitmapInfo(CGImageAlphaPremultipliedFirst)
+	CGBitmapAlphaLast                            = CGBitmapInfo(CGImageAlphaLast)
+	CGBitmapAlphaFirst                           = CGBitmapInfo(CGImageAlphaFirst)
+	CGBitmapAlphaNoneSkipLast                    = CGBitmapInfo(CGImageAlphaNoneSkipLast)
+	CGBitmapAlphaNoneSkipFirst                   = CGBitmapInfo(CGImageAlphaNoneSkipFirst)
+	CGBitmapAlphaOnly                            = CGBitmapInfo(CGImageAlphaOnly)
+	CGBitmapFloatInfoMask           CGBitmapInfo = 0xF00
+	CGBitmapFloatComponents         CGBitmapInfo = 1 << 8
+	CGBitmapByteOrderMask                        = CGBitmapInfo(CGImageByteOrderMask)
+	CGBitmapByteOrderDefault                     = CGBitmapInfo(CGImageByteOrderDefault)
+	CGBitmapByteOrder16Little                    = CGBitmapInfo(CGImageByteOrder16Little)
+	CGBitmapByteOrder32Little                    = CGBitmapInfo(CGImageByteOrder32Little)
+	CGBitmapByteOrder16Big                       = CGBitmapInfo(CGImageByteOrder16Big)
+	CGBitmapByteOrder32Big                       = CGBitmapInfo(CGImageByteOrder32Big)
+	CGBitmapByteOrder16Host                      = CGBitmapInfo(C.kCGBitmapByteOrder16Host)
+	CGBitmapByteOrder32Host                      = CGBitmapInfo(C.kCGBitmapByteOrder32Host)
 )
 
 type (
