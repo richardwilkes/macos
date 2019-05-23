@@ -63,6 +63,10 @@ func (c CGContext) SetFillPattern(pattern CGPattern, components ...float64) {
 	C.CGContextSetFillPattern(c, pattern, floatSliceToCGFloatPtr(components))
 }
 
+func (c CGContext) SetRGBStrokeColor(r, g, b, a float64) {
+	C.CGContextSetRGBStrokeColor(c, C.CGFloat(r), C.CGFloat(g), C.CGFloat(b), C.CGFloat(a))
+}
+
 func (c CGContext) SetStrokePattern(pattern CGPattern, components ...float64) {
 	C.CGContextSetStrokePattern(c, pattern, floatSliceToCGFloatPtr(components))
 }
