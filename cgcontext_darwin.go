@@ -1,5 +1,7 @@
 package macos
 
+import "unsafe"
+
 // #cgo LDFLAGS: -framework Cocoa
 // #import <CoreGraphics/CoreGraphics.h>
 import "C"
@@ -31,8 +33,8 @@ type (
 	CGInterpolationQuality int
 )
 
-func CGBitmapContextCreate(width, height, bitsPerComponent int, space CGColorSpace, bitmapInfo CGBitmapInfo) CGContext {
-	return C.CGBitmapContextCreate(nil, C.size_t(width), C.size_t(height), C.size_t(bitsPerComponent), 0, space, C.CGBitmapInfo(bitmapInfo))
+func CGBitmapContextCreate(data unsafe.Pointer, width, height, bitsPerComponent, bytesPerRow int, space CGColorSpace, bitmapInfo CGBitmapInfo) CGContext {
+	return C.CGBitmapContextCreate(data, C.size_t(width), C.size_t(height), C.size_t(bitsPerComponent), C.size_t(bytesPerRow), space, C.CGBitmapInfo(bitmapInfo))
 }
 
 func (c CGContext) BitmapContextCreateImage() CGImage {
