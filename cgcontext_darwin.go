@@ -135,7 +135,7 @@ func (c CGContext) MoveToPoint(x, y float64) {
 	C.CGContextMoveToPoint(c, C.CGFloat(x), C.CGFloat(y))
 }
 
-func (c CGContext) LineToPoint(x, y float64) {
+func (c CGContext) AddLineToPoint(x, y float64) {
 	C.CGContextAddLineToPoint(c, C.CGFloat(x), C.CGFloat(y))
 }
 
@@ -151,7 +151,7 @@ func (c CGContext) AddRect(x, y, width, height float64) {
 	C.CGContextAddRect(c, C.CGRectMake(C.CGFloat(x), C.CGFloat(y), C.CGFloat(width), C.CGFloat(height)))
 }
 
-func (c CGContext) Ellipse(x, y, width, height float64) {
+func (c CGContext) AddEllipseInRect(x, y, width, height float64) {
 	C.CGContextAddEllipseInRect(c, C.CGRectMake(C.CGFloat(x), C.CGFloat(y), C.CGFloat(width), C.CGFloat(height)))
 }
 
