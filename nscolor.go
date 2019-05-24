@@ -32,7 +32,7 @@ func AlternatingContentBackgroundColors() []*NSColor {
 	data := C.nsColorAlternatingContentBackgroundColors()
 	colors := make([]*NSColor, data.GetCount())
 	for i := range colors {
-		colors[i] = (*NSColor)(data.GetValueAtIndex(i))
+		colors[i] = &NSColor{native: C.NSColorPtr(data.GetValueAtIndex(i))}
 	}
 	return colors
 }
