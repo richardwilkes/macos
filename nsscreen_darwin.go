@@ -10,6 +10,10 @@ CFArrayRef nsScreenScreens() {
 	return (CFArrayRef)[NSScreen screens];
 }
 
+NSScreenPtr nsScreenMainScreen() {
+	return (NSScreenPtr)[NSScreen mainScreen];
+}
+
 NSRect nsScreenFrame(NSScreenPtr s) {
 	return [(NSScreen *)s frame];
 }
@@ -41,6 +45,10 @@ func Screens() []*NSScreen {
 		screens[i] = &NSScreen{native: C.NSScreenPtr(s.GetValueAtIndex(i))}
 	}
 	return screens
+}
+
+func MainScreen() *NSScreen {
+	return &NSScreen{native: C.nsScreenMainScreen()}
 }
 
 func (s *NSScreen) Frame() (x, y, width, height float64) {
