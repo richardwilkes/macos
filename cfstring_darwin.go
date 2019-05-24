@@ -1,8 +1,11 @@
 package macos
 
+import (
+	"unsafe"
+)
+
 // #import <CoreFoundation/CoreFoundation.h>
 import "C"
-import "unsafe"
 
 type CFString = C.CFStringRef
 
@@ -11,7 +14,11 @@ func CFStringCreateWithString(str string) CFString {
 }
 
 func CFStringCreateWithBytes(bytes []byte) CFString {
-	return C.CFStringCreateWithBytes(0, (*C.UInt8)(unsafe.Pointer(&bytes[0])), C.CFIndex(len(bytes)), C.kCFStringEncodingUTF8, 0)
+	var ptr *C.UInt8
+	if len(bytes) > 0 {
+		ptr = (*C.UInt8)(unsafe.Pointer(&bytes[0]))
+	}
+	return C.CFStringCreateWithBytes(0, ptr, C.CFIndex(len(bytes)), C.kCFStringEncodingUTF8, 0)
 }
 
 func (s CFString) GetLength() int {

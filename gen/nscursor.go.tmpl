@@ -1,0 +1,20 @@
+package macos
+
+/*
+#import <Cocoa/Cocoa.h>
+
+typedef void *NSCursorPtr;
+{{- range .}}
+
+NSCursorPtr get{{.}}() {
+	return [NSCursor {{.}}];
+}
+{{- end}}
+*/
+import "C"
+{{- range .}}
+
+func NSCursor{{firstToUpper .}}() *NSCursor {
+    return &NSCursor{native:C.get{{.}}()}
+}
+{{- end}}

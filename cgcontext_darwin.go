@@ -33,7 +33,7 @@ type (
 )
 
 func CGBitmapContextCreate(data unsafe.Pointer, width, height, bitsPerComponent, bytesPerRow int, space CGColorSpace, bitmapInfo CGBitmapInfo) CGContext {
-	return C.CGBitmapContextCreate(data, C.size_t(width), C.size_t(height), C.size_t(bitsPerComponent), C.size_t(bytesPerRow), space, C.CGBitmapInfo(bitmapInfo))
+	return C.CGBitmapContextCreate(data, C.size_t(width), C.size_t(height), C.size_t(bitsPerComponent), C.size_t(bytesPerRow), space, C.uint32_t(bitmapInfo))
 }
 
 func (c CGContext) BitmapContextCreateImage() CGImage {
