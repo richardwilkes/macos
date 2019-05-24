@@ -45,13 +45,11 @@ func dispatchTaskCallback(id uint64) {
 	recoverCallback := dispatchRecoverCallback
 	dispatchLock.Unlock()
 	if callback != nil {
-		if recoverCallback != nil {
-			defer func() {
-				if err := recover(); err != nil {
-					recoverCallback(err)
-				}
-			}()
-		}
+		defer func() {
+			if err := recover(); err != nil && recoverCallback != nil {
+				recoverCallback(err)
+			}
+		}()
 		callback()
 	}
 }
