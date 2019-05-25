@@ -4,6 +4,13 @@ package macos
 #import <Cocoa/Cocoa.h>
 
 typedef void *NSWindowPtr;
+typedef void *NSViewPtr;
+
+void windowDidResizeCallback(NSWindowPtr wnd);
+void windowDidBecomeKeyCallback(NSWindowPtr wnd);
+void windowDidResignKeyCallback(NSWindowPtr wnd);
+bool windowShouldCloseCallback(NSWindowPtr wnd);
+void windowWillCloseCallback(NSWindowPtr wnd);
 
 @interface KeyableWindow : NSWindow
 {
@@ -20,6 +27,31 @@ typedef void *NSWindowPtr;
 }
 @end
 
+@interface WindowDelegate : NSObject<NSWindowDelegate>
+@end
+
+@implementation WindowDelegate
+-(void)windowDidResize:(NSNotification *)notification {
+	windowDidResizeCallback((NSWindowPtr)[notification object]);
+}
+
+-(void)windowDidBecomeKey:(NSNotification *)notification {
+	windowDidBecomeKeyCallback((NSWindowPtr)[notification object]);
+}
+
+-(void)windowDidResignKey:(NSNotification *)notification {
+	windowDidResignKeyCallback((NSWindowPtr)[notification object]);
+}
+
+-(BOOL)windowShouldClose:(id)sender {
+	return windowShouldCloseCallback((NSWindowPtr)sender) ? YES : NO;
+}
+
+-(void)windowWillClose:(NSNotification *)notification {
+	windowWillCloseCallback((NSWindowPtr)[notification object]);
+}
+@end
+
 NSRect nsWindowContentRectForFrameRectStyleMask(CGFloat x, CGFloat y, CGFloat width, CGFloat height, NSWindowStyleMask styleMask) {
 	return [NSWindow contentRectForFrameRect:NSMakeRect(x, y, width, height) styleMask:styleMask];
 }
@@ -29,7 +61,9 @@ NSRect nsWindowFrameRectForContentRectStyleMask(CGFloat x, CGFloat y, CGFloat wi
 }
 
 NSWindowPtr nsWindowInitWithContentRectStyleMask(CGFloat x, CGFloat y, CGFloat width, CGFloat height, NSWindowStyleMask styleMask) {
-	return (NSWindowPtr)[[KeyableWindow alloc] initWithContentRect:NSMakeRect(x, y, width, height) styleMask:styleMask backing:NSBackingStoreBuffered defer:YES];
+	KeyableWindow *wnd = [[KeyableWindow alloc] initWithContentRect:NSMakeRect(x, y, width, height) styleMask:styleMask backing:NSBackingStoreBuffered defer:YES];
+	[wnd setDelegate: [WindowDelegate new]];
+	return (NSWindowPtr)wnd;
 }
 
 void nsWindowSetIsKeyable(NSWindowPtr w, bool keyable) {
@@ -64,8 +98,20 @@ void nsWindowPerformZoom(NSWindowPtr w) {
 	[(NSWindow *)w performZoom:nil];
 }
 
+NSViewPtr nsWindowContentView(NSWindowPtr w) {
+	return (NSViewPtr)[(NSWindow *)w contentView];
+}
+
+void nsWindowSetContentView(NSWindowPtr w, NSViewPtr v) {
+	[(NSWindow *)w setContentView:(NSView *)v];
+}
+
 void nsWindowClose(NSWindowPtr w) {
 	[(NSWindow *)w close];
+}
+
+NSPoint nsWindowMouseLocationOutsideOfEventStream(NSWindowPtr w) {
+	return [(NSWindow *)w mouseLocationOutsideOfEventStream];
 }
 */
 import "C"
@@ -85,13 +131,23 @@ const (
 	NSWindowStyleMaskFullSizeContentView    NSWindowStyleMask = 1 << 15
 )
 
+var nsWindowDelegateMap = make(map[C.NSWindowPtr]NSWindowDelegate)
+
 type (
 	NSWindowStyleMask int
 	NSWindowNative    = C.NSWindowPtr
 )
 
 type NSWindow struct {
-	native NSWindowNative
+	native C.NSWindowPtr
+}
+
+type NSWindowDelegate interface {
+	WindowDidResize(wnd *NSWindow)
+	WindowDidBecomeKey(wnd *NSWindow)
+	WindowDidResignKey(wnd *NSWindow)
+	WindowShouldClose(wnd *NSWindow) bool
+	WindowWillClose(wnd *NSWindow)
 }
 
 func NSWindowContentRectForFrameRectStyleMask(x, y, width, height float64, styleMask NSWindowStyleMask) (cx, cy, cwidth, cheight float64) {
@@ -110,6 +166,10 @@ func NSWindowInitWithContentRectStyleMask(x, y, width, height float64, styleMask
 
 func (w *NSWindow) Native() NSWindowNative {
 	return w.native
+}
+
+func (w *NSWindow) SetDelegate(delegate NSWindowDelegate) {
+	nsWindowDelegateMap[w.native] = delegate
 }
 
 func (w *NSWindow) SetIsKeyable(keyable bool) {
@@ -147,6 +207,20 @@ func (w *NSWindow) PerformZoom() {
 	C.nsWindowPerformZoom(w.native)
 }
 
+func (w *NSWindow) ContentView() *NSView {
+	return &NSView{native: C.nsWindowContentView(w.native)}
+}
+
+func (w *NSWindow) SetContentView(view *NSView) {
+	C.nsWindowSetContentView(w.native, view.native)
+}
+
 func (w *NSWindow) Close() {
 	C.nsWindowClose(w.native)
+	delete(nsWindowDelegateMap, w.native)
+}
+
+func (w *NSWindow) MouseLocationOutsideOfEventStream() (x, y float64) {
+	p := C.nsWindowMouseLocationOutsideOfEventStream(w.native)
+	return float64(p.x), float64(p.y)
 }
