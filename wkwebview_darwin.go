@@ -2,7 +2,6 @@ package macos
 
 /*
 #import <WebKit/WebKit.h>
-#import "authentication_challenge_response.h"
 
 typedef void *NSViewPtr;
 typedef void *WKWebViewPtr;
@@ -12,11 +11,12 @@ typedef void *WKNavigationActionPtr;
 typedef void *WKNavigationResponsePtr;
 typedef void *NSURLAuthenticationChallengePtr;
 typedef void *NSURLRequestPtr;
+typedef void *NSURLCredentialPtr;
 
 void wkWebViewDidCommitNavigation(WKWebViewPtr webView, WKNavigationPtr nav);
 void wkWebViewDidStartProvisionalNavigation(WKWebViewPtr webView, WKNavigationPtr nav);
 void wkWebViewDidReceiveServerRedirectForProvisionNavigation(WKWebViewPtr webView, WKNavigationPtr nav);
-AuthenticationChallengeResponse *wkWebViewDidReceiveAuthenticationChallenge(WKWebViewPtr webView, NSURLAuthenticationChallenge *challenge);
+NSURLCredentialPtr *wkWebViewDidReceiveAuthenticationChallenge(WKWebViewPtr webView, NSURLAuthenticationChallenge *challenge, NSURLSessionAuthChallengeDisposition *disposition);
 void wkWebViewDidFailNavigationWithError(WKWebViewPtr webView, WKNavigationPtr nav, CFStringRef msg);
 void wkWebViewDidFailProvisionalNavigationWithError(WKWebViewPtr webView, WKNavigationPtr nav, CFStringRef msg);
 void wkWebViewDidFinishNavigation(WKWebViewPtr webView, WKNavigationPtr nav);
@@ -24,10 +24,10 @@ void wkWebViewWebContentProcessDidTerminate(WKWebViewPtr webView);
 WKNavigationActionPolicy wkWebViewDecidePolicyForNavigationAction(WKWebViewPtr webView, WKNavigationPtr nav);
 WKNavigationResponsePolicy wkWebViewDecidePolicyForNavigationResponse(WKWebViewPtr webView, WKNavigationPtr nav);
 
-@interface nav : NSObject<WKNavigationDelegate>
+@interface WebViewNavDelegate : NSObject<WKNavigationDelegate>
 @end
 
-@implementation nav
+@implementation WebViewNavDelegate
 - (void)webView:(WKWebView *)webView didCommitNavigation:(WKNavigation *)navigation {
 	wkWebViewDidCommitNavigation(webView, navigation);
 }
@@ -41,8 +41,9 @@ WKNavigationResponsePolicy wkWebViewDecidePolicyForNavigationResponse(WKWebViewP
 }
 
 - (void)webView:(WKWebView *)webView didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge completionHandler:(void (^)(NSURLSessionAuthChallengeDisposition disposition, NSURLCredential *credential))completionHandler {
-	AuthenticationChallengeResponse *response = wkWebViewDidReceiveAuthenticationChallenge(webView, challenge);
-	completionHandler(response->disposition, response->credential);
+	NSURLSessionAuthChallengeDisposition disposition;
+	NSURLCredentialPtr credential = wkWebViewDidReceiveAuthenticationChallenge(webView, challenge, &disposition);
+	completionHandler(disposition, (NSURLCredential *)credential);
 }
 
 - (void)webView:(WKWebView *)webView didFailNavigation:(WKNavigation *)navigation withError:(NSError *)error {
@@ -70,16 +71,23 @@ WKNavigationResponsePolicy wkWebViewDecidePolicyForNavigationResponse(WKWebViewP
 }
 @end
 
+static WebViewNavDelegate *webViewNavDelegate = nil;
+
 WKWebViewPtr wkWebViewInitWithFrameConfiguration(CGFloat x, CGFloat y, CGFloat width, CGFloat height, WKWebViewConfigurationPtr config) {
-	return (WKWebViewPtr)[[WKWebView alloc] initWithFrame:NSMakeRect(x, y, width, height) configuration:(WKWebViewConfiguration *)config];
+	WKWebView *view = [[WKWebView alloc] initWithFrame:NSMakeRect(x, y, width, height) configuration:(WKWebViewConfiguration *)config];
+	if (!webViewNavDelegate) {
+		webViewNavDelegate = [WebViewNavDelegate new];
+	}
+	[view setNavigationDelegate:webViewNavDelegate];
+	return (WKWebViewPtr)view;
 }
 
-void wkWebViewLoadRequest(WKWebViewPtr wv, NSURLRequestPtr request) {
-	[(WKWebView *)wv loadRequest:(NSURLRequest *)request];
+void wkWebViewLoadRequest(WKWebViewPtr view, NSURLRequestPtr request) {
+	[(WKWebView *)view loadRequest:(NSURLRequest *)request];
 }
 
-void wkWebViewRelease(WKWebViewPtr wv) {
-	[(WKWebView *)wv release];
+void wkWebViewRelease(WKWebViewPtr view) {
+	[(WKWebView *)view release];
 }
 */
 import "C"
@@ -108,7 +116,6 @@ type (
 	WKNavigationActionPolicy             int
 	WKNavigationResponsePolicy           int
 	WKNavigationPtr                      = C.WKNavigationPtr
-	authenticationChallengeResponse      = C.AuthenticationChallengeResponse
 )
 
 type wkWebViewDelegateInfo struct {

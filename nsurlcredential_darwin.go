@@ -2,7 +2,8 @@ package macos
 
 /*
 #import <WebKit/WebKit.h>
-#import "authentication_challenge_response.h"
+
+typedef void *NSURLCredentialPtr;
 
 NSURLCredentialPtr nsURLCredentialForTrust(SecTrustRef trust) {
 	return (NSURLCredentialPtr)[NSURLCredential credentialForTrust:trust];
