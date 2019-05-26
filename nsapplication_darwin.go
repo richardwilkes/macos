@@ -7,6 +7,7 @@ typedef void *NSApplicationPtr;
 typedef void *NSRunningApplicationPtr;
 typedef void *NSNotificationPtr;
 typedef void *NSWindowPtr;
+typedef void *NSMenuPtr;
 
 // Prototypes for app_callbacks_darwin.go
 void applicationWillFinishLaunchingCallback(NSNotificationPtr aNotification);
@@ -106,6 +107,22 @@ void nsApplicationReplyToApplicationShouldTerminate(NSApplicationPtr app, bool s
 
 void nsApplicationTerminate(NSApplicationPtr app, NSApplicationPtr sender) {
 	[(NSApplication *)app terminate:(NSApplication *)sender];
+}
+
+void nsApplicationSetMainMenu(NSApplicationPtr app, NSMenuPtr menu) {
+	[(NSApplication *)app setMainMenu:(NSMenu *)menu];
+}
+
+void nsApplicationSetServicesMenu(NSApplicationPtr app, NSMenuPtr menu) {
+	[(NSApplication *)app setServicesMenu:(NSMenu *)menu];
+}
+
+void nsApplicationSetWindowsMenu(NSApplicationPtr app, NSMenuPtr menu) {
+	[(NSApplication *)app setWindowsMenu:(NSMenu *)menu];
+}
+
+void nsApplicationSetHelpMenu(NSApplicationPtr app, NSMenuPtr menu) {
+	[(NSApplication *)app setHelpMenu:(NSMenu *)menu];
 }
 
 NSRunningApplicationPtr nsRunningApplicationCurrent() {
@@ -221,6 +238,22 @@ func (app *NSApplication) Terminate(sender *NSApplication) {
 		s = sender.native
 	}
 	C.nsApplicationTerminate(app.native, s)
+}
+
+func (app *NSApplication) SetMainMenu(menu *NSMenu) {
+	C.nsApplicationSetMainMenu(app.native, menu.native)
+}
+
+func (app *NSApplication) SetServicesMenu(menu *NSMenu) {
+	C.nsApplicationSetServicesMenu(app.native, menu.native)
+}
+
+func (app *NSApplication) SetWindowsMenu(menu *NSMenu) {
+	C.nsApplicationSetWindowsMenu(app.native, menu.native)
+}
+
+func (app *NSApplication) SetHelpMenu(menu *NSMenu) {
+	C.nsApplicationSetHelpMenu(app.native, menu.native)
 }
 
 type NSRunningApplication struct {

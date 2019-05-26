@@ -9,6 +9,7 @@ typedef void *NSApplicationPtr;
 typedef void *NSNotificationPtr;
 typedef void *NSWindowPtr;
 typedef void *NSViewPtr;
+typedef void *NSMenuItemPtr;
 */
 import "C"
 
@@ -200,6 +201,21 @@ func viewKeyDownCallback(view C.NSViewPtr, keyCode int, ch CFString, mod int, re
 func viewKeyUpCallback(view C.NSViewPtr, keyCode, mod int) {
 	if d, ok := nsViewDelegateMap[view]; ok {
 		d.ViewKeyUpEvent(&NSView{native: view}, keyCode, mod)
+	}
+}
+
+//export menuItemValidateCallback
+func menuItemValidateCallback(tag int) bool {
+	if validator, ok := nsMenuItemValidators[tag]; ok && validator != nil {
+		return validator()
+	}
+	return true
+}
+
+//export menuItemHandleCallback
+func menuItemHandleCallback(tag int) {
+	if handler, ok := nsMenuItemHandlers[tag]; ok && handler != nil {
+		handler()
 	}
 }
 
