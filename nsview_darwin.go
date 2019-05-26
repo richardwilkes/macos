@@ -155,12 +155,32 @@ NSRect nsViewFrame(NSViewPtr v) {
 	return [(NSView *)v frame];
 }
 
+void nsViewSetFrame(NSViewPtr v, CGFloat x, CGFloat y, CGFloat width, CGFloat height) {
+	[(NSView *)v setFrame:NSMakeRect(x, y, width, height)];
+}
+
+void nsViewSetNeedsLayout(NSViewPtr v, bool needsLayout) {
+	[(NSView *)v setNeedsLayout:needsLayout ? YES : NO];
+}
+
+void nsViewSetNeedsDisplay(NSViewPtr v, bool needsDisplay) {
+	[(NSView *)v setNeedsDisplay:needsDisplay ? YES : NO];
+}
+
 void nsViewSetNeedsDisplayInRect(NSViewPtr v, CGFloat x, CGFloat y, CGFloat width, CGFloat height) {
 	[(NSView *)v setNeedsDisplayInRect:NSMakeRect(x, y, width, height)];
 }
 
 bool nsViewInLiveResize(NSViewPtr v) {
 	return [(NSView *)v inLiveResize] != 0;
+}
+
+void nsViewAddSubview(NSViewPtr v, NSViewPtr sub) {
+	return [(NSView *)v addSubview:(NSView *)sub];
+}
+
+void nsViewRemoveFromSuperview(NSViewPtr v) {
+	[(NSView *)v removeFromSuperview];
 }
 
 void nsViewRelease(NSViewPtr v) {
@@ -218,12 +238,32 @@ func (v *NSView) Frame() (x, y, width, height float64) {
 	return float64(r.origin.x), float64(r.origin.y), float64(r.size.width), float64(r.size.height)
 }
 
+func (v *NSView) SetFrame(x, y, width, height float64) {
+	C.nsViewSetFrame(v.native, C.CGFloat(x), C.CGFloat(y), C.CGFloat(width), C.CGFloat(height))
+}
+
+func (v *NSView) SetNeedsLayout(needsLayout bool) {
+	C.nsViewSetNeedsLayout(v.native, C.bool(needsLayout))
+}
+
+func (v *NSView) SetNeedsDisplay(needsDisplay bool) {
+	C.nsViewSetNeedsDisplay(v.native, C.bool(needsDisplay))
+}
+
 func (v *NSView) SetNeedsDisplayInRect(x, y, width, height float64) {
 	C.nsViewSetNeedsDisplayInRect(v.native, C.CGFloat(x), C.CGFloat(y), C.CGFloat(width), C.CGFloat(height))
 }
 
 func (v *NSView) InLiveResize() bool {
 	return bool(C.nsViewInLiveResize(v.native))
+}
+
+func (v *NSView) AddSubview(view *NSView) {
+	C.nsViewAddSubview(v.native, view.native)
+}
+
+func (v *NSView) RemoveFromSuperview() {
+	C.nsViewRemoveFromSuperview(v.native)
 }
 
 func (v *NSView) Release() {
