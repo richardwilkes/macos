@@ -5,6 +5,7 @@ package macos
 
 typedef void *NSWindowPtr;
 typedef void *NSViewPtr;
+typedef void *NSTrackingAreaPtr;
 
 void viewDrawCallback(NSViewPtr view, CGContextRef gc, CGFloat x, CGFloat y, CGFloat width, CGFloat height, bool inLiveResize);
 void viewMouseDownCallback(NSViewPtr view, CGFloat x, CGFloat y, int button, int clickCount, int mod);
@@ -151,6 +152,10 @@ NSWindowPtr nsViewWindow(NSViewPtr v) {
 	return (NSWindowPtr)[(NSView *)v window];
 }
 
+void nsViewAddTrackingArea(NSViewPtr v, NSTrackingAreaPtr ta) {
+	[(NSView *)v addTrackingArea:ta];
+}
+
 NSRect nsViewFrame(NSViewPtr v) {
 	return [(NSView *)v frame];
 }
@@ -231,6 +236,10 @@ func (v *NSView) Window() *NSWindow {
 		return &NSWindow{native: wnd}
 	}
 	return nil
+}
+
+func (v *NSView) AddTrackingArea(trackingArea *NSTrackingArea) {
+	C.nsViewAddTrackingArea(v.native, trackingArea.native)
 }
 
 func (v *NSView) Frame() (x, y, width, height float64) {
