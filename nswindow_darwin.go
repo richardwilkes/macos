@@ -5,12 +5,20 @@ package macos
 
 typedef void *NSWindowPtr;
 typedef void *NSViewPtr;
+typedef void *NSDraggingInfoPtr;
 
 void windowDidResizeCallback(NSWindowPtr wnd);
 void windowDidBecomeKeyCallback(NSWindowPtr wnd);
 void windowDidResignKeyCallback(NSWindowPtr wnd);
 bool windowShouldCloseCallback(NSWindowPtr wnd);
 void windowWillCloseCallback(NSWindowPtr wnd);
+NSDragOperation windowDraggingEnteredCallback(NSDraggingInfoPtr di);
+NSDragOperation windowDraggingUpdatedCallback(NSDraggingInfoPtr di);
+void windowDraggingExitedCallback(NSDraggingInfoPtr di);
+void windowDraggingEndedCallback(NSDraggingInfoPtr di);
+bool windowPrepareForDragCallback(NSDraggingInfoPtr di);
+bool windowPerformDragCallback(NSDraggingInfoPtr di);
+void windowConcludeDragCallback(NSDraggingInfoPtr di);
 
 @interface KeyableWindow : NSWindow
 {
@@ -49,6 +57,34 @@ void windowWillCloseCallback(NSWindowPtr wnd);
 
 -(void)windowWillClose:(NSNotification *)notification {
 	windowWillCloseCallback((NSWindowPtr)[notification object]);
+}
+
+-(NSDragOperation)draggingEntered:(id<NSDraggingInfo>)sender {
+	return windowDraggingEnteredCallback((NSDraggingInfoPtr)sender);
+}
+
+-(NSDragOperation)draggingUpdated:(id<NSDraggingInfo>)sender {
+	return windowDraggingUpdatedCallback((NSDraggingInfoPtr)sender);
+}
+
+-(void)draggingExited:(id<NSDraggingInfo>)sender {
+	windowDraggingExitedCallback((NSDraggingInfoPtr)sender);
+}
+
+-(void)draggingEnded:(id<NSDraggingInfo>)sender {
+	windowDraggingEndedCallback((NSDraggingInfoPtr)sender);
+}
+
+-(BOOL)prepareForDragOperation:(id<NSDraggingInfo>)sender {
+	return windowPrepareForDragCallback((NSDraggingInfoPtr)sender) ? YES : NO;
+}
+
+-(BOOL)performDragOperation:(id<NSDraggingInfo>)sender {
+	return windowPerformDragCallback((NSDraggingInfoPtr)sender) ? YES : NO;
+}
+
+-(void)concludeDragOperation:(id<NSDraggingInfo>)sender {
+	windowConcludeDragCallback((NSDraggingInfoPtr)sender);
 }
 @end
 
@@ -113,8 +149,15 @@ void nsWindowClose(NSWindowPtr w) {
 NSPoint nsWindowMouseLocationOutsideOfEventStream(NSWindowPtr w) {
 	return [(NSWindow *)w mouseLocationOutsideOfEventStream];
 }
+
+void nsWindowRegisterForDraggedTypes(NSWindowPtr w, CFArrayRef types) {
+	[(NSWindow *)w registerForDraggedTypes:(NSArray<NSPasteboardType> *)types];
+}
 */
 import "C"
+import (
+	"math"
+)
 
 const (
 	NSWindowStyleMaskBorderless             NSWindowStyleMask = 0
@@ -129,6 +172,19 @@ const (
 	NSWindowStyleMaskHUDWindow              NSWindowStyleMask = 1 << 13
 	NSWindowStyleMaskFullScreen             NSWindowStyleMask = 1 << 14
 	NSWindowStyleMaskFullSizeContentView    NSWindowStyleMask = 1 << 15
+)
+
+type NSDragOperation = uint32
+
+const (
+	NSDragOperationCopy NSDragOperation = 1 << iota
+	NSDragOperationLink
+	NSDragOperationGeneric
+	NSDragOperationPrivate
+	NSDragOperationMove
+	NSDragOperationDelete
+	NSDragOperationNone  NSDragOperation = 0
+	NSDragOperationEvery NSDragOperation = math.MaxUint32
 )
 
 var nsWindowDelegateMap = make(map[C.NSWindowPtr]NSWindowDelegate)
@@ -148,6 +204,13 @@ type NSWindowDelegate interface {
 	WindowDidResignKey(wnd *NSWindow)
 	WindowShouldClose(wnd *NSWindow) bool
 	WindowWillClose(wnd *NSWindow)
+	WindowDragEntered(wnd *NSWindow, di *NSDraggingInfo) NSDragOperation
+	WindowDragUpdated(wnd *NSWindow, di *NSDraggingInfo) NSDragOperation
+	WindowDragExited(wnd *NSWindow)
+	WindowDragEnded(wnd *NSWindow)
+	WindowDropIsAcceptable(wnd *NSWindow, di *NSDraggingInfo) bool
+	WindowDrop(wnd *NSWindow, di *NSDraggingInfo) bool
+	WindowDropFinished(wnd *NSWindow, di *NSDraggingInfo)
 }
 
 func NSWindowContentRectForFrameRectStyleMask(x, y, width, height float64, styleMask NSWindowStyleMask) (cx, cy, cwidth, cheight float64) {
@@ -223,4 +286,12 @@ func (w *NSWindow) Close() {
 func (w *NSWindow) MouseLocationOutsideOfEventStream() (x, y float64) {
 	p := C.nsWindowMouseLocationOutsideOfEventStream(w.native)
 	return float64(p.x), float64(p.y)
+}
+
+func (w *NSWindow) RegisterForDraggedTypes(dataTypes ...string) {
+	a := CFMutableArrayCreate(len(dataTypes))
+	for _, dt := range dataTypes {
+		a.AppendStringValue(dt)
+	}
+	C.nsWindowRegisterForDraggedTypes(w.native, a.AsCFArray())
 }
