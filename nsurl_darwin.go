@@ -10,7 +10,11 @@ NSURLPtr nsURLWithString(CFStringRef url) {
 }
 
 CFStringRef nsURLFilePathURL(NSURLPtr u) {
-	return (CFStringRef)[[(NSURL *)u filePathURL] absoluteString];
+	NSURL *url = [(NSURL *)u filePathURL];
+	if (url) {
+		return (CFStringRef)[url absoluteString];
+	}
+	return (CFStringRef)@"";
 }
 */
 import "C"
@@ -25,6 +29,6 @@ func NSURLWithString(url string) *NSURL {
 	return &NSURL{native: C.nsURLWithString(str)}
 }
 
-func (u *NSURL) FilePath() string {
+func (u *NSURL) ResolveFilePath() string {
 	return C.nsURLFilePathURL(u.native).String()
 }
