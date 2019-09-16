@@ -9,7 +9,7 @@ type CFMutableArray struct {
 }
 
 func CFMutableArrayCreate(capacity int) *CFMutableArray {
-	return &CFMutableArray{native: C.CFArrayCreateMutable(0, C.CFIndex(capacity), &C.kCFTypeArrayCallBacks)}
+	return &CFMutableArray{native: C.CFArrayCreateMutable(0, C.CFIndex(capacity), &C.kCFTypeArrayCallBacks)} //nolint:gocritic,staticcheck
 }
 
 func CFMutableArrayCreateNoCap() *CFMutableArray {
@@ -21,7 +21,7 @@ func (a *CFMutableArray) AppendValue(value unsafe.Pointer) {
 }
 
 func (a *CFMutableArray) AppendStringValue(value string) {
-	C.CFArrayAppendValue(a.native, unsafe.Pointer(CFStringCreateWithString(value)))
+	C.CFArrayAppendValue(a.native, unsafe.Pointer(CFStringCreateWithString(value))) //nolint:govet
 }
 
 func (a *CFMutableArray) AsCFArray() CFArray {
