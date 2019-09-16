@@ -180,6 +180,10 @@ func (c CGContext) DrawImage(x, y, width, height float64, img CGImage) {
 	C.CGContextDrawImage(c, C.CGRectMake(C.CGFloat(x), C.CGFloat(y), C.CGFloat(width), C.CGFloat(height)), img)
 }
 
+func (c CGContext) DrawLayer(x, y, width, height float64, layer CGLayer) {
+	C.CGContextDrawLayerInRect(c, C.CGRectMake(C.CGFloat(x), C.CGFloat(y), C.CGFloat(width), C.CGFloat(height)), layer)
+}
+
 func (c CGContext) DrawLinearGradient(gradient CGGradient, sx, sy, ex, ey float64, options CGGradientDrawingOptions) {
 	C.CGContextDrawLinearGradient(c, gradient, C.CGPointMake(C.CGFloat(sx), C.CGFloat(sy)), C.CGPointMake(C.CGFloat(ex), C.CGFloat(ey)), C.CGGradientDrawingOptions(options))
 }
