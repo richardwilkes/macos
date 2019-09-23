@@ -1,6 +1,10 @@
 package macos
 
-import "sync"
+import (
+	"sync"
+
+	"github.com/richardwilkes/toolbox/errs"
+)
 
 /*
 #import <dispatch/dispatch.h>
@@ -17,7 +21,7 @@ var (
 	dispatchLock            sync.Mutex
 	dispatchID              uint64 = 1
 	dispatchMap                    = make(map[uint64]func())
-	dispatchRecoverCallback func(interface{})
+	dispatchRecoverCallback errs.RecoveryHandler
 )
 
 func DispatchAsyncFOnMainQueue(callback func()) {
@@ -29,9 +33,9 @@ func DispatchAsyncFOnMainQueue(callback func()) {
 	C.dispatchAsyncFOnMainQueue(C.uint64_t(id))
 }
 
-func SetDispatchRecoverCallback(f func(interface{})) {
+func SetDispatchRecoverCallback(recoveryHandler errs.RecoveryHandler) {
 	dispatchLock.Lock()
-	dispatchRecoverCallback = f
+	dispatchRecoverCallback = recoveryHandler
 	dispatchLock.Unlock()
 }
 
@@ -45,11 +49,7 @@ func dispatchTaskCallback(id uint64) {
 	recoverCallback := dispatchRecoverCallback
 	dispatchLock.Unlock()
 	if callback != nil {
-		defer func() {
-			if err := recover(); err != nil && recoverCallback != nil {
-				recoverCallback(err)
-			}
-		}()
+		defer errs.Recovery(recoverCallback)
 		callback()
 	}
 }
