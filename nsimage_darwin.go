@@ -10,42 +10,38 @@ NSImagePtr nsImageInitWithCGImageSizeRetain(CGImageRef img, CGFloat width, CGFlo
 	return [[[NSImage alloc] initWithCGImage:img size:NSMakeSize(width, height)] retain];
 }
 
-void nsImageRetain(NSImagePtr img) {
-	[((NSImage *)img) retain];
-}
-
 void nsImageRelease(NSImagePtr img) {
 	[((NSImage *)img) release];
 }
 */
 import "C"
 
-type NSImage struct {
-	native     C.NSImagePtr
-	refcnt     int
-	releasable bool
+import "github.com/richardwilkes/toolbox/softref"
+
+type NSImage softref.SoftRef
+
+type nsImageRef struct {
+	key    string
+	native C.NSImagePtr
 }
 
 func NSImageInitWithCGImageSizeRetain(img CGImage, width, height float64) *NSImage {
-	return &NSImage{
+	ref, _ := softref.DefaultPool.NewSoftRef(&nsImageRef{
+		key:    NextRefKey(),
 		native: C.nsImageInitWithCGImageSizeRetain(img, C.CGFloat(width), C.CGFloat(height)),
-		refcnt: 1,
-	}
+	})
+	return (*NSImage)(ref)
 }
 
-func (img *NSImage) Retain() {
-	if img.releasable && img.native != nil {
-		img.refcnt++
-		C.nsImageRetain(img.native)
-	}
+func (img *NSImage) native() C.NSImagePtr {
+	return img.Resource.(*nsImageRef).native
 }
 
-func (img *NSImage) Release() {
-	if img.releasable && img.native != nil {
-		img.refcnt--
-		if img.refcnt <= 0 {
-			C.nsImageRelease(img.native)
-			img.native = nil
-		}
-	}
+func (r *nsImageRef) Key() string {
+	return r.key
+}
+
+func (r *nsImageRef) Release() {
+	C.nsImageRelease(r.native)
+	r.native = nil
 }

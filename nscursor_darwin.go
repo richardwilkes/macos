@@ -18,19 +18,18 @@ void nsCursorSetHiddenUntilMouseMoves(bool hide) {
 	[NSCursor setHiddenUntilMouseMoves:hide ? YES : NO];
 }
 
-void nsCursorRetain(NSCursorPtr cursor) {
-	[((NSCursor *)cursor) retain];
-}
-
 void nsCursorRelease(NSCursorPtr cursor) {
 	[((NSCursor *)cursor) release];
 }
 */
 import "C"
+import "github.com/richardwilkes/toolbox/softref"
 
-type NSCursor struct {
+type NSCursor softref.SoftRef
+
+type nsCursorRef struct {
+	key        string
 	native     C.NSCursorPtr
-	refcnt     int
 	releasable bool
 }
 
@@ -39,30 +38,37 @@ func NSCursorSetHiddenUntilMouseMoves(hide bool) {
 }
 
 func NSCursorInitWithImageHotSpotRetain(img *NSImage, hotX, hotY float64) *NSCursor {
-	return &NSCursor{
-		native:     C.nsCursorInitWithImageHotSpotRetain(img.native, C.CGFloat(hotX), C.CGFloat(hotY)),
-		refcnt:     1,
+	ref, _ := softref.DefaultPool.NewSoftRef(&nsCursorRef{
+		key:        NextRefKey(),
+		native:     C.nsCursorInitWithImageHotSpotRetain(img.native(), C.CGFloat(hotX), C.CGFloat(hotY)),
 		releasable: true,
-	}
+	})
+	return (*NSCursor)(ref)
+}
+
+func nsCursorInit(native C.NSCursorPtr) *NSCursor {
+	ref, _ := softref.DefaultPool.NewSoftRef(&nsCursorRef{
+		key:    NextRefKey(),
+		native: native,
+	})
+	return (*NSCursor)(ref)
+}
+
+func (c *NSCursor) native() C.NSCursorPtr {
+	return c.Resource.(*nsCursorRef).native
 }
 
 func (c *NSCursor) Set() {
-	C.nsCursorSet(c.native)
+	C.nsCursorSet(c.native())
 }
 
-func (c *NSCursor) Retain() {
-	if c.releasable && c.native != nil {
-		c.refcnt++
-		C.nsCursorRetain(c.native)
-	}
+func (r *nsCursorRef) Key() string {
+	return r.key
 }
 
-func (c *NSCursor) Release() {
-	if c.releasable && c.native != nil {
-		c.refcnt--
-		if c.refcnt <= 0 {
-			C.nsCursorRelease(c.native)
-			c.native = nil
-		}
+func (r *nsCursorRef) Release() {
+	if r.releasable {
+		C.nsCursorRelease(r.native)
+		r.native = nil
 	}
 }

@@ -12,9 +12,18 @@ NSCursorPtr get{{.}}() {
 {{- end}}
 */
 import "C"
+
+var (
+{{- range .}}
+	nsCursor{{firstToUpper .}} *NSCursor
+{{- end}}
+)
 {{- range .}}
 
 func NSCursor{{firstToUpper .}}() *NSCursor {
-    return &NSCursor{native:C.get{{.}}()}
+	if nsCursor{{firstToUpper .}} == nil {
+		nsCursor{{firstToUpper .}} = nsCursorInit(C.get{{.}}())
+	}
+    return nsCursor{{firstToUpper .}}
 }
 {{- end}}

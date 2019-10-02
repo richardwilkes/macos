@@ -80,74 +80,149 @@ NSCursorPtr getcontextualMenuCursor() {
 */
 import "C"
 
+var (
+	nsCursorArrowCursor                  *NSCursor
+	nsCursorIBeamCursor                  *NSCursor
+	nsCursorIBeamCursorForVerticalLayout *NSCursor
+	nsCursorCrosshairCursor              *NSCursor
+	nsCursorClosedHandCursor             *NSCursor
+	nsCursorOpenHandCursor               *NSCursor
+	nsCursorPointingHandCursor           *NSCursor
+	nsCursorResizeLeftCursor             *NSCursor
+	nsCursorResizeRightCursor            *NSCursor
+	nsCursorResizeLeftRightCursor        *NSCursor
+	nsCursorResizeUpCursor               *NSCursor
+	nsCursorResizeDownCursor             *NSCursor
+	nsCursorResizeUpDownCursor           *NSCursor
+	nsCursorDisappearingItemCursor       *NSCursor
+	nsCursorOperationNotAllowedCursor    *NSCursor
+	nsCursorDragLinkCursor               *NSCursor
+	nsCursorDragCopyCursor               *NSCursor
+	nsCursorContextualMenuCursor         *NSCursor
+)
+
 func NSCursorArrowCursor() *NSCursor {
-	return &NSCursor{native: C.getarrowCursor()}
+	if nsCursorArrowCursor == nil {
+		nsCursorArrowCursor = nsCursorInit(C.getarrowCursor())
+	}
+	return nsCursorArrowCursor
 }
 
 func NSCursorIBeamCursor() *NSCursor {
-	return &NSCursor{native: C.getIBeamCursor()}
+	if nsCursorIBeamCursor == nil {
+		nsCursorIBeamCursor = nsCursorInit(C.getIBeamCursor())
+	}
+	return nsCursorIBeamCursor
 }
 
 func NSCursorIBeamCursorForVerticalLayout() *NSCursor {
-	return &NSCursor{native: C.getIBeamCursorForVerticalLayout()}
+	if nsCursorIBeamCursorForVerticalLayout == nil {
+		nsCursorIBeamCursorForVerticalLayout = nsCursorInit(C.getIBeamCursorForVerticalLayout())
+	}
+	return nsCursorIBeamCursorForVerticalLayout
 }
 
 func NSCursorCrosshairCursor() *NSCursor {
-	return &NSCursor{native: C.getcrosshairCursor()}
+	if nsCursorCrosshairCursor == nil {
+		nsCursorCrosshairCursor = nsCursorInit(C.getcrosshairCursor())
+	}
+	return nsCursorCrosshairCursor
 }
 
 func NSCursorClosedHandCursor() *NSCursor {
-	return &NSCursor{native: C.getclosedHandCursor()}
+	if nsCursorClosedHandCursor == nil {
+		nsCursorClosedHandCursor = nsCursorInit(C.getclosedHandCursor())
+	}
+	return nsCursorClosedHandCursor
 }
 
 func NSCursorOpenHandCursor() *NSCursor {
-	return &NSCursor{native: C.getopenHandCursor()}
+	if nsCursorOpenHandCursor == nil {
+		nsCursorOpenHandCursor = nsCursorInit(C.getopenHandCursor())
+	}
+	return nsCursorOpenHandCursor
 }
 
 func NSCursorPointingHandCursor() *NSCursor {
-	return &NSCursor{native: C.getpointingHandCursor()}
+	if nsCursorPointingHandCursor == nil {
+		nsCursorPointingHandCursor = nsCursorInit(C.getpointingHandCursor())
+	}
+	return nsCursorPointingHandCursor
 }
 
 func NSCursorResizeLeftCursor() *NSCursor {
-	return &NSCursor{native: C.getresizeLeftCursor()}
+	if nsCursorResizeLeftCursor == nil {
+		nsCursorResizeLeftCursor = nsCursorInit(C.getresizeLeftCursor())
+	}
+	return nsCursorResizeLeftCursor
 }
 
 func NSCursorResizeRightCursor() *NSCursor {
-	return &NSCursor{native: C.getresizeRightCursor()}
+	if nsCursorResizeRightCursor == nil {
+		nsCursorResizeRightCursor = nsCursorInit(C.getresizeRightCursor())
+	}
+	return nsCursorResizeRightCursor
 }
 
 func NSCursorResizeLeftRightCursor() *NSCursor {
-	return &NSCursor{native: C.getresizeLeftRightCursor()}
+	if nsCursorResizeLeftRightCursor == nil {
+		nsCursorResizeLeftRightCursor = nsCursorInit(C.getresizeLeftRightCursor())
+	}
+	return nsCursorResizeLeftRightCursor
 }
 
 func NSCursorResizeUpCursor() *NSCursor {
-	return &NSCursor{native: C.getresizeUpCursor()}
+	if nsCursorResizeUpCursor == nil {
+		nsCursorResizeUpCursor = nsCursorInit(C.getresizeUpCursor())
+	}
+	return nsCursorResizeUpCursor
 }
 
 func NSCursorResizeDownCursor() *NSCursor {
-	return &NSCursor{native: C.getresizeDownCursor()}
+	if nsCursorResizeDownCursor == nil {
+		nsCursorResizeDownCursor = nsCursorInit(C.getresizeDownCursor())
+	}
+	return nsCursorResizeDownCursor
 }
 
 func NSCursorResizeUpDownCursor() *NSCursor {
-	return &NSCursor{native: C.getresizeUpDownCursor()}
+	if nsCursorResizeUpDownCursor == nil {
+		nsCursorResizeUpDownCursor = nsCursorInit(C.getresizeUpDownCursor())
+	}
+	return nsCursorResizeUpDownCursor
 }
 
 func NSCursorDisappearingItemCursor() *NSCursor {
-	return &NSCursor{native: C.getdisappearingItemCursor()}
+	if nsCursorDisappearingItemCursor == nil {
+		nsCursorDisappearingItemCursor = nsCursorInit(C.getdisappearingItemCursor())
+	}
+	return nsCursorDisappearingItemCursor
 }
 
 func NSCursorOperationNotAllowedCursor() *NSCursor {
-	return &NSCursor{native: C.getoperationNotAllowedCursor()}
+	if nsCursorOperationNotAllowedCursor == nil {
+		nsCursorOperationNotAllowedCursor = nsCursorInit(C.getoperationNotAllowedCursor())
+	}
+	return nsCursorOperationNotAllowedCursor
 }
 
 func NSCursorDragLinkCursor() *NSCursor {
-	return &NSCursor{native: C.getdragLinkCursor()}
+	if nsCursorDragLinkCursor == nil {
+		nsCursorDragLinkCursor = nsCursorInit(C.getdragLinkCursor())
+	}
+	return nsCursorDragLinkCursor
 }
 
 func NSCursorDragCopyCursor() *NSCursor {
-	return &NSCursor{native: C.getdragCopyCursor()}
+	if nsCursorDragCopyCursor == nil {
+		nsCursorDragCopyCursor = nsCursorInit(C.getdragCopyCursor())
+	}
+	return nsCursorDragCopyCursor
 }
 
 func NSCursorContextualMenuCursor() *NSCursor {
-	return &NSCursor{native: C.getcontextualMenuCursor()}
+	if nsCursorContextualMenuCursor == nil {
+		nsCursorContextualMenuCursor = nsCursorInit(C.getcontextualMenuCursor())
+	}
+	return nsCursorContextualMenuCursor
 }
