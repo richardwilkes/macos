@@ -7,8 +7,26 @@ typedef void *NSMenuPtr;
 typedef void *NSMenuItemPtr;
 typedef void *NSViewPtr;
 
+void updateMenuCallback(NSMenuPtr menu);
+
+@interface MenuDelegate : NSObject<NSMenuDelegate>
+@end
+
+@implementation MenuDelegate
+- (void)menuNeedsUpdate:(NSMenu *)menu {
+	updateMenuCallback((NSMenuPtr)(menu));
+}
+@end
+
+static MenuDelegate *menuDelegate = nil;
+
 NSMenuPtr nsMenuInitWithTitle(CFStringRef title) {
-	return [[[NSMenu alloc] initWithTitle:(NSString *)title] retain];
+	NSMenu *menu = [[[NSMenu alloc] initWithTitle:(NSString *)title] retain];
+	if (!menuDelegate) {
+		menuDelegate = [MenuDelegate new];
+	}
+	[menu setDelegate:menuDelegate];
+	return menu;
 }
 
 CFStringRef nsMenuTitle(NSMenuPtr m) {
@@ -43,14 +61,20 @@ import "C"
 
 type NSMenuNative = C.NSMenuPtr
 
+var nsMenuUpdaters = make(map[C.NSMenuPtr]func(*NSMenu))
+
 type NSMenu struct {
 	native C.NSMenuPtr
 }
 
-func NSMenuInitWithTitle(title string) *NSMenu {
+func NSMenuInitWithTitle(title string, updater func(menu *NSMenu)) *NSMenu {
 	str := CFStringCreateWithString(title)
 	defer str.Release()
-	return &NSMenu{native: C.nsMenuInitWithTitle(str)}
+	m := &NSMenu{native: C.nsMenuInitWithTitle(str)}
+	if updater != nil {
+		nsMenuUpdaters[m.native] = updater
+	}
+	return m
 }
 
 func (m *NSMenu) Native() NSMenuNative {

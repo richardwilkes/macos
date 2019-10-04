@@ -6,8 +6,8 @@ github.com/pkg/term v0.0.0-20190109203006-aa71e9d9e942 h1:A7GG7zcGjl3jqAqGPmcNjd
 github.com/pkg/term v0.0.0-20190109203006-aa71e9d9e942/go.mod h1:eCbImbZ95eXtAUIbLAuAVnBnwf83mjf6QIVH8SHYwqQ=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
-github.com/richardwilkes/toolbox v1.15.0 h1:usRq4fUnGFJs1s+ElXeOf+rwoS066Z7N2k/F4DUgv88=
-github.com/richardwilkes/toolbox v1.15.0/go.mod h1:tXLgOqaYAOUAzFXdYqKPoTUeYFLkfv99BIwa55bz3oo=
+github.com/richardwilkes/toolbox v1.16.0 h1:NUmISOLwVIjhfqcvSKbd+QYc0qKSeLegAxOXMtRc45Y=
+github.com/richardwilkes/toolbox v1.16.0/go.mod h1:tXLgOqaYAOUAzFXdYqKPoTUeYFLkfv99BIwa55bz3oo=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/testify v1.4.0 h1:2E4SXV/wtOkTonXsotYi4li6zVWxYlZuYNCXe9XRJyk=
 github.com/stretchr/testify v1.4.0/go.mod h1:j7eGeouHqKxXV5pUuKE4zz7dFj8WfuZ+81PSLYec5m4=
