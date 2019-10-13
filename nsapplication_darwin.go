@@ -77,8 +77,16 @@ void nsApplicationSetDelegate(NSApplicationPtr app) {
 	[NSDistributedNotificationCenter.defaultCenter addObserver:delegate selector:@selector(themeChanged:) name:@"AppleColorPreferencesChangedNotification" object: nil];
 }
 
+bool nsApplicationActive(NSApplicationPtr app) {
+	return [(NSApplication *)app isActive];
+}
+
 void nsApplicationSetActivationPolicy(NSApplicationPtr app, NSApplicationActivationPolicy policy) {
 	[(NSApplication *)app setActivationPolicy:policy];
+}
+
+void nsApplicationActivateIgnoringOtherApps(NSApplicationPtr app, bool force) {
+	[(NSApplication *)app activateIgnoringOtherApps:force];
 }
 
 NSWindowPtr nsApplicationKeyWindow(NSApplicationPtr app) {
@@ -190,8 +198,16 @@ func (app *NSApplication) SetDelegate(delegate NSApplicationDelegate) {
 	C.nsApplicationSetDelegate(app.native)
 }
 
+func (app *NSApplication) Active() bool {
+	return bool(C.nsApplicationActive(app.native))
+}
+
 func (app *NSApplication) SetActivationPolicy(policy NSApplicationActivationPolicy) {
 	C.nsApplicationSetActivationPolicy(app.native, C.NSApplicationActivationPolicy(policy))
+}
+
+func (app *NSApplication) ActivateIgnoringOtherApps(force bool) {
+	C.nsApplicationActivateIgnoringOtherApps(app.native, C.bool(force))
 }
 
 func (app *NSApplication) KeyWindow() *NSWindow {
