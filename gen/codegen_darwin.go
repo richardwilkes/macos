@@ -82,31 +82,36 @@ var (
 )
 
 func main() {
-	dir, err := os.Open("..")
+	dir, err := os.Open(filepath.Join("..", "ns"))
 	fatalIfErr(err)
 	fis, err := dir.Readdir(-1)
 	fatalIfErr(err)
 	fatalIfErr(dir.Close())
 	for _, fi := range fis {
-		if !fi.IsDir() && strings.HasSuffix(strings.ToLower(fi.Name()), "_gen.go") {
-			fatalIfErr(os.Remove(filepath.Join("..", fi.Name())))
+		if !fi.IsDir() && strings.HasSuffix(strings.ToLower(fi.Name()), "_gen_darwin.go") {
+			fatalIfErr(os.Remove(filepath.Join("..", "ns", fi.Name())))
 		}
 	}
-	processTemplate("nscolor", systemColorNames)
-	processTemplate("nscursor", systemCursorNames)
+	processTemplate("color", systemColorNames)
+	processTemplate("cursor", systemCursorNames)
 }
 
 func processTemplate(name string, arg interface{}) {
 	var buffer bytes.Buffer
 	fmt.Fprintf(&buffer, "// Code generated from \"tmpl/%s.go.tmpl\" - DO NOT EDIT.\n", name)
 	tmpl, err := template.New(name + ".go.tmpl").Funcs(template.FuncMap{
+		"firstToLower": firstToLower,
 		"firstToUpper": firstToUpper,
 	}).ParseFiles(name + ".go.tmpl")
 	fatalIfErr(err)
 	fatalIfErr(tmpl.Execute(&buffer, arg))
 	data, err := format.Source(buffer.Bytes())
 	fatalIfErr(err)
-	fatalIfErr(ioutil.WriteFile(filepath.Join("..", name+"_gen_darwin.go"), data, 0644))
+	fatalIfErr(ioutil.WriteFile(filepath.Join("..", "ns", name+"_gen_darwin.go"), data, 0644))
+}
+
+func firstToLower(in string) string {
+	return string(unicode.ToLower(rune(in[0]))) + in[1:]
 }
 
 func firstToUpper(in string) string {

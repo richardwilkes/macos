@@ -1,0 +1,29 @@
+package ns
+
+/*
+#import <Cocoa/Cocoa.h>
+
+typedef void *NSCursorPtr;
+{{- range .}}
+
+NSCursorPtr get{{firstToUpper .}}() {
+	return [NSCursor {{.}}];
+}
+{{- end}}
+*/
+import "C"
+
+var (
+{{- range .}}
+	{{firstToLower .}} *Cursor
+{{- end}}
+)
+{{- range .}}
+
+func {{firstToUpper .}}() *Cursor {
+	if {{firstToLower .}} == nil {
+		{{firstToLower .}} = cursorInit(C.get{{firstToUpper .}}())
+	}
+	return {{firstToLower .}}
+}
+{{- end}}

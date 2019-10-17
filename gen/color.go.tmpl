@@ -1,0 +1,20 @@
+package ns
+
+/*
+#import <Cocoa/Cocoa.h>
+
+typedef void *NSColorPtr;
+{{- range .}}
+
+NSColorPtr {{.}}() {
+	return [NSColor {{.}}];
+}
+{{- end}}
+*/
+import "C"
+{{- range .}}
+
+func {{firstToUpper .}}() *Color {
+	return &Color{native:C.{{.}}()}
+}
+{{- end}}
