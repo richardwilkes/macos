@@ -131,6 +131,14 @@ void nsApplicationSetWindowsMenu(NSApplicationPtr app, NSMenuPtr menu) {
 void nsApplicationSetHelpMenu(NSApplicationPtr app, NSMenuPtr menu) {
 	[(NSApplication *)app setHelpMenu:(NSMenu *)menu];
 }
+
+NSModalResponse nsApplicationRunModalForWindow(NSApplicationPtr app, NSWindowPtr window) {
+	return [(NSApplication *)app runModalForWindow:(NSWindow *)window];
+}
+
+void nsApplicationStopModalWithCode(NSApplicationPtr app, NSModalResponse code) {
+	return [(NSApplication *)app stopModalWithCode:code];
+}
 */
 import "C"
 
@@ -213,6 +221,14 @@ func (app *Application) MainWindow() *Window {
 
 func (app *Application) Run() {
 	C.nsApplicationRun(app.native)
+}
+
+func (app *Application) RunModalForWindow(wnd *Window) int {
+	return int(C.nsApplicationRunModalForWindow(app.native, wnd.native))
+}
+
+func (app *Application) StopModalWithCode(code int) {
+	C.nsApplicationStopModalWithCode(app.native, C.NSModalResponse(code))
 }
 
 func (app *Application) UnhideAllApplications(sender *Application) {
