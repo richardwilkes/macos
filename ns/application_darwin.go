@@ -18,6 +18,7 @@ void applicationWillBecomeActiveCallback(NSNotificationPtr aNotification);
 void applicationDidBecomeActiveCallback(NSNotificationPtr aNotification);
 void applicationWillResignActiveCallback(NSNotificationPtr aNotification);
 void applicationDidResignActiveCallback(NSNotificationPtr aNotification);
+void applicationOpenURLsCallback(NSApplicationPtr theApplication, CFArrayRef urls);
 void themeChangedCallback(NSNotificationPtr aNotification);
 
 @interface AppDelegate : NSObject<NSApplicationDelegate>
@@ -58,6 +59,10 @@ void themeChangedCallback(NSNotificationPtr aNotification);
 
 - (void)applicationDidResignActive:(NSNotification *)aNotification {
 	applicationDidResignActiveCallback((NSNotificationPtr)aNotification);
+}
+
+- (void)application:(NSApplication *)theApplication openURLs:(NSArray<NSURL *> *)urls {
+	applicationOpenURLsCallback((NSApplicationPtr)theApplication, (CFArrayRef)(urls));
 }
 
 - (void)themeChanged:(NSNotification *)aNotification {
@@ -177,6 +182,7 @@ type ApplicationDelegate interface {
 	ApplicationDidBecomeActive(notification *Notification)
 	ApplicationWillResignActive(notification *Notification)
 	ApplicationDidResignActive(notification *Notification)
+	ApplicationOpenURLs(sender *Application, urls []string)
 	ThemeChanged(notification *Notification)
 }
 

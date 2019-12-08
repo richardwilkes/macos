@@ -1,10 +1,14 @@
 package ns
 
 /*
+#import <CoreFoundation/CoreFoundation.h>
+
 typedef void *NSApplicationPtr;
 typedef void *NSNotificationPtr;
+typedef void *NSURLPtr;
 */
 import "C"
+import "github.com/richardwilkes/macos/cf"
 
 //export applicationWillFinishLaunchingCallback
 func applicationWillFinishLaunchingCallback(aNotification C.NSNotificationPtr) {
@@ -68,6 +72,20 @@ func applicationWillResignActiveCallback(aNotification C.NSNotificationPtr) {
 func applicationDidResignActiveCallback(aNotification C.NSNotificationPtr) {
 	if currentAppDelegate != nil {
 		currentAppDelegate.ApplicationDidResignActive(&Notification{native: aNotification})
+	}
+}
+
+//export applicationOpenURLsCallback
+func applicationOpenURLsCallback(theApplication C.NSApplicationPtr, cUrls C.CFArrayRef) {
+	if currentAppDelegate != nil {
+		urls := cf.Array(cUrls)
+		count := urls.GetCount()
+		urlList := make([]string, 0, count)
+		for i := 0; i < count; i++ {
+			one := URL{native: C.NSURLPtr(urls.GetValueAtIndex(i))}
+			urlList = append(urlList, one.ResolveFilePath())
+		}
+		currentAppDelegate.ApplicationOpenURLs(&Application{native: theApplication}, urlList)
 	}
 }
 
