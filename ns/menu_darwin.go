@@ -51,8 +51,16 @@ void nsMenuRemoveItem(NSMenuPtr m, int index) {
 	[(NSMenu *)m removeItemAtIndex:index];
 }
 
-void nsMenuPopupMenuPositioningItemAtLocationInView(NSMenuPtr m, NSMenuItemPtr mi, CGFloat x, CGFloat y, NSViewPtr view) {
-	[(NSMenu *)m popUpMenuPositioningItem:(NSMenuItem *)mi atLocation:NSMakePoint(x, y) inView:(NSView *)view];
+void nsMenuPopupMenuPositioningItemAtLocationInView(NSMenuPtr m, NSMenuItemPtr mi, CGFloat x, CGFloat y, CGFloat width, CGFloat height, NSViewPtr view) {
+	// I don't use popupMenuPositioningItem:atLocation:inView: here because it
+	// fails to work when a modal dialog is being used.
+	NSPopUpButtonCell *popUpButtonCell = [[NSPopUpButtonCell alloc] initTextCell:@"" pullsDown:NO];
+	[popUpButtonCell setAutoenablesItems:NO];
+	[popUpButtonCell setAltersStateOfSelectedItem:NO];
+	[popUpButtonCell setMenu:(NSMenu *)m];
+	[popUpButtonCell selectItem:(NSMenuItem *)mi];
+	[popUpButtonCell performClickWithFrame:NSMakeRect(x, y, width, height) inView:(NSView *)view];
+	[popUpButtonCell release];
 }
 
 void nsMenuRelease(NSMenuPtr m) {
@@ -103,8 +111,8 @@ func (m *Menu) RemoveItem(index int) {
 	C.nsMenuRemoveItem(m.native, C.int(index))
 }
 
-func (m *Menu) PopupMenuPositioningItemAtLocationInView(item *MenuItem, x, y float64, view *View) {
-	C.nsMenuPopupMenuPositioningItemAtLocationInView(m.native, item.native, C.CGFloat(x), C.CGFloat(y), view.native)
+func (m *Menu) PopupMenuPositioningItemAtLocationInView(item *MenuItem, x, y, width, height float64, view *View) {
+	C.nsMenuPopupMenuPositioningItemAtLocationInView(m.native, item.native, C.CGFloat(x), C.CGFloat(y), C.CGFloat(width), C.CGFloat(height), view.native)
 }
 
 func (m *Menu) Release() {

@@ -1,6 +1,8 @@
 package ns
 
-import "github.com/richardwilkes/macos/cf"
+import (
+	"github.com/richardwilkes/macos/cf"
+)
 
 /*
 #import <Cocoa/Cocoa.h>
@@ -77,11 +79,6 @@ type MenuItem struct {
 }
 
 func MenuItemInitWithTitleActionKeyEquivalent(tag int, title, keyEquiv string, modifiers int, validator func() bool, handler func()) *MenuItem {
-	tstr := cf.StringCreateWithString(title)
-	defer tstr.Release()
-	kstr := cf.StringCreateWithString(keyEquiv)
-	defer kstr.Release()
-	item := &MenuItem{native: C.nsMenuItemInitWithTitleActionKeyEquivalent(C.int(tag), C.CFStringRef(tstr), C.CFStringRef(kstr), C.int(modifiers))}
 	if validator != nil {
 		menuItemValidators[tag] = validator
 	} else {
@@ -92,7 +89,11 @@ func MenuItemInitWithTitleActionKeyEquivalent(tag int, title, keyEquiv string, m
 	} else {
 		delete(menuItemHandlers, tag)
 	}
-	return item
+	tstr := cf.StringCreateWithString(title)
+	defer tstr.Release()
+	kstr := cf.StringCreateWithString(keyEquiv)
+	defer kstr.Release()
+	return &MenuItem{native: C.nsMenuItemInitWithTitleActionKeyEquivalent(C.int(tag), C.CFStringRef(tstr), C.CFStringRef(kstr), C.int(modifiers))}
 }
 
 func MenuSeparatorItem() *MenuItem {
