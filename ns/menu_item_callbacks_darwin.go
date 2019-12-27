@@ -5,7 +5,7 @@ import "C"
 //export menuItemValidateCallback
 func menuItemValidateCallback(tag int) bool {
 	if validator, ok := menuItemValidators[tag]; ok && validator != nil {
-		return validator()
+		return validator(tag)
 	}
 	return true
 }
@@ -13,6 +13,6 @@ func menuItemValidateCallback(tag int) bool {
 //export menuItemHandleCallback
 func menuItemHandleCallback(tag int) {
 	if handler, ok := menuItemHandlers[tag]; ok && handler != nil {
-		handler()
+		handler(tag)
 	}
 }

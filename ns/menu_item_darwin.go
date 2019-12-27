@@ -85,16 +85,19 @@ const (
 	MenuItemStateOn
 )
 
+type MenuValidator func(tag int) bool
+type MenuHandler func(tag int)
+
 var (
-	menuItemValidators = make(map[int]func() bool)
-	menuItemHandlers   = make(map[int]func())
+	menuItemValidators = make(map[int]MenuValidator)
+	menuItemHandlers   = make(map[int]MenuHandler)
 )
 
 type MenuItem struct {
 	native C.NSMenuItemPtr
 }
 
-func MenuItemInitWithTitleActionKeyEquivalent(tag int, title, keyEquiv string, modifiers int, validator func() bool, handler func()) *MenuItem {
+func MenuItemInitWithTitleActionKeyEquivalent(tag int, title, keyEquiv string, modifiers int, validator MenuValidator, handler MenuHandler) *MenuItem {
 	if validator != nil {
 		menuItemValidators[tag] = validator
 	} else {
