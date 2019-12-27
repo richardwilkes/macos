@@ -47,6 +47,14 @@ int nsMenuItemTag(NSMenuItemPtr mi) {
 	return [(NSMenuItem *)mi tag];
 }
 
+NSControlStateValue nsMenuItemState(NSMenuItemPtr mi) {
+	return [(NSMenuItem *)mi state];
+}
+
+void nsMenuItemSetState(NSMenuItemPtr mi, NSControlStateValue state) {
+	[(NSMenuItem *)mi setState:(NSControlStateValue)state];
+}
+
 CFStringRef nsMenuItemTitle(NSMenuItemPtr mi) {
 	return (CFStringRef)[(NSMenuItem *)mi title];
 }
@@ -68,6 +76,14 @@ void nsMenuItemSetSubmenu(NSMenuItemPtr mi, NSMenuPtr menu) {
 }
 */
 import "C"
+
+type MenuItemState int
+
+const (
+	MenuItemStateMixed MenuItemState = iota - 1
+	MenuItemStateOff
+	MenuItemStateOn
+)
 
 var (
 	menuItemValidators = make(map[int]func() bool)
@@ -102,6 +118,14 @@ func MenuSeparatorItem() *MenuItem {
 
 func (mi *MenuItem) Tag() int {
 	return int(C.nsMenuItemTag(mi.native))
+}
+
+func (mi *MenuItem) State() MenuItemState {
+	return MenuItemState(C.nsMenuItemState(mi.native))
+}
+
+func (mi *MenuItem) SetState(state MenuItemState) {
+	C.nsMenuItemSetState(mi.native, C.NSControlStateValue(state))
 }
 
 func (mi *MenuItem) Title() string {
