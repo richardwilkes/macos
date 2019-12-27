@@ -10,19 +10,19 @@ import (
 typedef void *NSMenuPtr;
 typedef void *NSMenuItemPtr;
 
-bool menuItemValidateCallback(int tag);
-void menuItemHandleCallback(int tag);
+bool menuItemValidateCallback(NSMenuItemPtr item);
+void menuItemHandleCallback(NSMenuItemPtr item);
 
 @interface MenuItemDelegate : NSObject<NSMenuItemValidation>
 @end
 
 @implementation MenuItemDelegate
 - (BOOL)validateMenuItem:(NSMenuItem *)menuItem {
-	return menuItemValidateCallback([menuItem tag]) ? YES : NO;
+	return menuItemValidateCallback((NSMenuItemPtr)menuItem) ? YES : NO;
 }
 
 - (void)handleMenuItem:(id)sender {
-	menuItemHandleCallback([(NSMenuItem *)sender tag]);
+	menuItemHandleCallback((NSMenuItemPtr)sender);
 }
 @end
 
@@ -41,6 +41,14 @@ NSMenuItemPtr nsMenuItemInitWithTitleActionKeyEquivalent(int tag, CFStringRef ti
 
 NSMenuItemPtr nsMenuSeparatorItem() {
 	return (NSMenuItemPtr)[[NSMenuItem separatorItem] retain];
+}
+
+NSMenuPtr nsMenuItemMenu(NSMenuItemPtr mi) {
+	return (NSMenuPtr)[(NSMenuItem *)mi menu];
+}
+
+bool nsMenuItemIsSeparator(NSMenuItemPtr mi) {
+	return [(NSMenuItem *)mi isSeparatorItem];
 }
 
 int nsMenuItemTag(NSMenuItemPtr mi) {
@@ -63,15 +71,15 @@ void nsMenuItemSetTitle(NSMenuItemPtr mi, CFStringRef title) {
 	[(NSMenuItem *)mi setTitle:(NSString *)title];
 }
 
-bool nsMenuItemHasSubmenu(NSMenuItemPtr mi) {
+bool nsMenuItemHasSubMenu(NSMenuItemPtr mi) {
 	return [(NSMenuItem *)mi hasSubmenu] != 0;
 }
 
-NSMenuPtr nsMenuItemSubmenu(NSMenuItemPtr mi) {
+NSMenuPtr nsMenuItemSubMenu(NSMenuItemPtr mi) {
 	return [(NSMenuItem *)mi submenu];
 }
 
-void nsMenuItemSetSubmenu(NSMenuItemPtr mi, NSMenuPtr menu) {
+void nsMenuItemSetSubMenu(NSMenuItemPtr mi, NSMenuPtr menu) {
 	[(NSMenuItem *)mi setSubmenu:(NSMenu *)menu];
 }
 */
@@ -85,38 +93,56 @@ const (
 	MenuItemStateOn
 )
 
-type MenuValidator func(tag int) bool
-type MenuHandler func(tag int)
+type MenuValidator func(item *MenuItem) bool
+type MenuHandler func(item *MenuItem)
 
 var (
-	menuItemValidators = make(map[int]MenuValidator)
-	menuItemHandlers   = make(map[int]MenuHandler)
+	menuItemValidators = make(map[C.NSMenuItemPtr]MenuValidator)
+	menuItemHandlers   = make(map[C.NSMenuItemPtr]MenuHandler)
 )
+
+type MenuItemNative = C.NSMenuItemPtr
 
 type MenuItem struct {
 	native C.NSMenuItemPtr
 }
 
 func MenuItemInitWithTitleActionKeyEquivalent(tag int, title, keyEquiv string, modifiers int, validator MenuValidator, handler MenuHandler) *MenuItem {
-	if validator != nil {
-		menuItemValidators[tag] = validator
-	} else {
-		delete(menuItemValidators, tag)
-	}
-	if handler != nil {
-		menuItemHandlers[tag] = handler
-	} else {
-		delete(menuItemHandlers, tag)
-	}
 	tstr := cf.StringCreateWithString(title)
 	defer tstr.Release()
 	kstr := cf.StringCreateWithString(keyEquiv)
 	defer kstr.Release()
-	return &MenuItem{native: C.nsMenuItemInitWithTitleActionKeyEquivalent(C.int(tag), C.CFStringRef(tstr), C.CFStringRef(kstr), C.int(modifiers))}
+	item := &MenuItem{native: C.nsMenuItemInitWithTitleActionKeyEquivalent(C.int(tag), C.CFStringRef(tstr), C.CFStringRef(kstr), C.int(modifiers))}
+	if validator != nil {
+		menuItemValidators[item.native] = validator
+	} else {
+		delete(menuItemValidators, item.native)
+	}
+	if handler != nil {
+		menuItemHandlers[item.native] = handler
+	} else {
+		delete(menuItemHandlers, item.native)
+	}
+	return item
+}
+
+func (mi *MenuItem) Native() MenuItemNative {
+	return mi.native
 }
 
 func MenuSeparatorItem() *MenuItem {
 	return &MenuItem{native: C.nsMenuSeparatorItem()}
+}
+
+func (mi *MenuItem) Menu() *Menu {
+	if m := C.nsMenuItemMenu(mi.native); m != nil {
+		return &Menu{native: m}
+	}
+	return nil
+}
+
+func (mi *MenuItem) IsSeparator() bool {
+	return bool(C.nsMenuItemIsSeparator(mi.native))
 }
 
 func (mi *MenuItem) Tag() int {
@@ -141,17 +167,17 @@ func (mi *MenuItem) SetTitle(title string) {
 	str.Release()
 }
 
-func (mi *MenuItem) HasSubmenu() bool {
-	return bool(C.nsMenuItemHasSubmenu(mi.native))
+func (mi *MenuItem) HasSubMenu() bool {
+	return bool(C.nsMenuItemHasSubMenu(mi.native))
 }
 
-func (mi *MenuItem) Submenu() *Menu {
-	if m := C.nsMenuItemSubmenu(mi.native); m != nil {
+func (mi *MenuItem) SubMenu() *Menu {
+	if m := C.nsMenuItemSubMenu(mi.native); m != nil {
 		return &Menu{native: m}
 	}
 	return nil
 }
 
-func (mi *MenuItem) SetSubmenu(menu *Menu) {
-	C.nsMenuItemSetSubmenu(mi.native, menu.native)
+func (mi *MenuItem) SetSubMenu(menu *Menu) {
+	C.nsMenuItemSetSubMenu(mi.native, menu.native)
 }
