@@ -30,6 +30,7 @@ linters-settings:
       - sloppyReassign
       - dupImport
       - commentFormatting
+      - whyNoLint
   gofmt:
     simplify: true
   golint:
