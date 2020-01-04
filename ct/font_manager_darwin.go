@@ -9,11 +9,27 @@
 
 package ct
 
-import "github.com/richardwilkes/macos/cf"
+import (
+	"unsafe"
+
+	"github.com/richardwilkes/macos/cf"
+)
 
 // #import <CoreText/CoreText.h>
 import "C"
 
 func FontManagerCreateFontDescriptorFromData(data cf.Data) FontDescriptor {
 	return C.CTFontManagerCreateFontDescriptorFromData(C.CFDataRef(data))
+}
+
+func FontManagerEnableFontDescriptors(enable bool, descriptors ...FontDescriptor) {
+	if len(descriptors) > 0 {
+		a := cf.MutableArrayCreate(len(descriptors))
+		for i := range descriptors {
+			a.AppendValue(unsafe.Pointer(descriptors[i])) //nolint:govet
+		}
+		ma := a.AsCFArray()
+		C.CTFontManagerEnableFontDescriptors(C.CFArrayRef(ma), C.bool(enable))
+		ma.Release()
+	}
 }
