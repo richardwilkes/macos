@@ -2,9 +2,24 @@
   <dictionary name="rich">
     <words>
       <w>affero</w>
+      <w>alloced</w>
+      <w>borderless</w>
+      <w>crosshair</w>
+      <w>disp</w>
+      <w>gocritic</w>
+      <w>govet</w>
       <w>licensable</w>
+      <w>macos</w>
+      <w>miniaturizable</w>
       <w>mozilla</w>
+      <w>nonactivating</w>
+      <w>nsurl</w>
+      <w>staticcheck</w>
+      <w>subprocess</w>
       <w>trollworks</w>
+      <w>unconvert</w>
+      <w>unemphasized</w>
+      <w>unhide</w>
     </words>
   </dictionary>
 </component>

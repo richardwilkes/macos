@@ -44,12 +44,15 @@ func (l Line) GetTypographicBounds(ascent, descent, leading *float64) float64 {
 	}
 	width := float64(C.CTLineGetTypographicBounds(l, af, df, lf))
 	if ascent != nil {
+		// noinspection GoNilness
 		*ascent = float64(*af)
 	}
 	if descent != nil {
+		// noinspection GoNilness
 		*descent = float64(*df)
 	}
 	if leading != nil {
+		// noinspection GoNilness
 		*leading = float64(*lf)
 	}
 	return width
@@ -67,6 +70,7 @@ func (l Line) GetOffsetForStringIndex(index int, secondaryOffset *float64) float
 	}
 	result := float64(C.CTLineGetOffsetForStringIndex(l, C.CFIndex(index), offset))
 	if secondaryOffset != nil {
+		// noinspection GoNilness
 		*secondaryOffset = float64(*offset)
 	}
 	return result

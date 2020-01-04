@@ -225,12 +225,12 @@ type WindowDelegate interface {
 	WindowDropFinished(wnd *Window, di *DraggingInfo)
 }
 
-func WindowContentRectForFrameRectStyleMask(x, y, width, height float64, styleMask WindowStyleMask) (cx, cy, cwidth, cheight float64) {
+func WindowContentRectForFrameRectStyleMask(x, y, width, height float64, styleMask WindowStyleMask) (cx, cy, cWidth, cHeight float64) {
 	r := C.nsWindowContentRectForFrameRectStyleMask(C.CGFloat(x), C.CGFloat(y), C.CGFloat(width), C.CGFloat(height), C.NSWindowStyleMask(styleMask))
 	return float64(r.origin.x), float64(r.origin.y), float64(r.size.width), float64(r.size.height)
 }
 
-func WindowFrameRectForContentRectStyleMask(x, y, width, height float64, styleMask WindowStyleMask) (cx, cy, cwidth, cheight float64) {
+func WindowFrameRectForContentRectStyleMask(x, y, width, height float64, styleMask WindowStyleMask) (cx, cy, cWidth, cHeight float64) {
 	r := C.nsWindowFrameRectForContentRectStyleMask(C.CGFloat(x), C.CGFloat(y), C.CGFloat(width), C.CGFloat(height), C.NSWindowStyleMask(styleMask))
 	return float64(r.origin.x), float64(r.origin.y), float64(r.size.width), float64(r.size.height)
 }

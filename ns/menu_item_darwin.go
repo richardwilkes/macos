@@ -117,11 +117,11 @@ type MenuItem struct {
 }
 
 func MenuItemInitWithTitleActionKeyEquivalent(tag int, title, keyEquiv string, modifiers int, validator MenuValidator, handler MenuHandler) *MenuItem {
-	tstr := cf.StringCreateWithString(title)
-	defer tstr.Release()
-	kstr := cf.StringCreateWithString(keyEquiv)
-	defer kstr.Release()
-	item := &MenuItem{native: C.nsMenuItemInitWithTitleActionKeyEquivalent(C.int(tag), C.CFStringRef(tstr), C.CFStringRef(kstr), C.int(modifiers))}
+	tStr := cf.StringCreateWithString(title)
+	defer tStr.Release()
+	kStr := cf.StringCreateWithString(keyEquiv)
+	defer kStr.Release()
+	item := &MenuItem{native: C.nsMenuItemInitWithTitleActionKeyEquivalent(C.int(tag), C.CFStringRef(tStr), C.CFStringRef(kStr), C.int(modifiers))}
 	if validator != nil {
 		menuItemValidators[item.native] = validator
 	} else {
