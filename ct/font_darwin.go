@@ -97,6 +97,10 @@ func FontCreateUIFontForLanguage(uiType FontUIFontType, size float64, language s
 	return C.CTFontCreateUIFontForLanguage(C.CTFontUIFontType(uiType), C.CGFloat(size), C.CFStringRef(lang))
 }
 
+func FontCreateWithFontDescriptor(descriptor FontDescriptor, size float64, matrix *cg.AffineTransform) Font {
+	return C.CTFontCreateWithFontDescriptor(C.CTFontDescriptorRef(descriptor), C.CGFloat(size), (*C.CGAffineTransform)(unsafe.Pointer(matrix))) //nolint:unconvert
+}
+
 func (f Font) CreateCopyWithSymbolicTraits(size float64, matrix *cg.AffineTransform, value, mask FontSymbolicTraits) Font {
 	return C.CTFontCreateCopyWithSymbolicTraits(f, C.CGFloat(size), (*C.CGAffineTransform)(unsafe.Pointer(matrix)), C.CTFontSymbolicTraits(value), C.CTFontSymbolicTraits(mask))
 }
