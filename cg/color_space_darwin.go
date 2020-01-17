@@ -9,10 +9,14 @@
 
 package cg
 
+import "github.com/richardwilkes/macos/cf"
+
 // #import <CoreGraphics/CoreGraphics.h>
 import "C"
 
 type ColorSpace = C.CGColorSpaceRef
+
+const ColorSpaceSRGBName = "CGColorSpaceSRGB"
 
 func ColorSpaceCreateDeviceRGB() ColorSpace {
 	return C.CGColorSpaceCreateDeviceRGB()
@@ -20,6 +24,12 @@ func ColorSpaceCreateDeviceRGB() ColorSpace {
 
 func ColorSpaceCreatePattern(baseSpace ColorSpace) ColorSpace {
 	return C.CGColorSpaceCreatePattern(baseSpace)
+}
+
+func ColorSpaceCreateWithName(name string) ColorSpace {
+	str := cf.StringCreateWithString(name)
+	defer str.Release()
+	return C.CGColorSpaceCreateWithName(C.CFStringRef(str))
 }
 
 func (cs ColorSpace) Release() {
