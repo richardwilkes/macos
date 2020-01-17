@@ -16,7 +16,7 @@ import "C"
 
 type ColorSpace = C.CGColorSpaceRef
 
-const ColorSpaceSRGBName = "CGColorSpaceSRGB"
+const ColorSpaceSRGBName = "kCGColorSpaceSRGB"
 
 func ColorSpaceCreateDeviceRGB() ColorSpace {
 	return C.CGColorSpaceCreateDeviceRGB()
